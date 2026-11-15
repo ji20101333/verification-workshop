@@ -12,38 +12,58 @@ public class StackAr {
     /** Index of the top element (-1 when the stack is empty). */
     private /*@ spec_public @*/ int top = -1;
 
-    // TODO (4): class invariant
+    //@ public invariant elems != null && -1 <= top && top < elems.length;
 
-    // TODO (4): specify every constructor and method
+    //@ ensures \fresh(elems) && elems.length == DEFAULT_CAPACITY && top == -1;
     public StackAr() {
         this(DEFAULT_CAPACITY);
     }
 
+    //@ requires 0 <= capacity;
+    //@ ensures \fresh(elems) && elems.length == capacity && top == -1;
     public StackAr(int capacity) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        elems = new int[capacity];
+        top = -1;
     }
 
+    //@ ensures \result <==> top == -1;
     public /*@ pure @*/ boolean isEmpty() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return top == -1;
     }
 
+    //@ ensures \result <==> top + 1 == elems.length;
     public /*@ pure @*/ boolean isFull() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return top + 1 == elems.length;
     }
 
+    //@ ensures \result == top + 1;
     public /*@ pure @*/ int size() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return top + 1;
     }
 
+    //@ requires top + 1 < elems.length;
+    //@ assignable top, elems[top + 1];
+    //@ ensures top == \old(top) + 1;
+    //@ ensures elems[top] == o;
+    //@ ensures (\forall int k; 0 <= k && k < \old(top) + 1; elems[k] == \old(elems[k]));
     public void push(int o) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        top = top + 1;
+        elems[top] = o;
     }
 
+    //@ requires top >= 0;
+    //@ assignable top;
+    //@ ensures top == \old(top) - 1;
+    //@ ensures \result == \old(elems[\old(top)]);
     public int pop() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        int r = elems[top];
+        top = top - 1;
+        return r;
     }
 
+    //@ requires top >= 0;
+    //@ ensures \result == elems[top];
     public /*@ pure @*/ int peek() {
-        throw new UnsupportedOperationException("Not implemented yet");
+        return elems[top];
     }
 }
