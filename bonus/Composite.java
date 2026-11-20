@@ -31,12 +31,14 @@ public final class Composite {
         value = v;
     }
 
-    /** Adds c as a child: c must be a single node (no parent, no children) other than this. */
+    /** Adds c as a child: c must be a root (no parent) other than this and must not
+        be an ancestor of this. Subtrees are allowed; the ancestor check is what
+        keeps the structure acyclic. */
     public void addChild(Composite c) {
         if (c == null) {
             throw new IllegalArgumentException();
         }
-        if (c == this || c.parent != null || c.firstChild != null) {
+        if (c == this || c.parent != null || isAncestor(c, this)) {
             throw new IllegalArgumentException();
         }
         c.parent = this;
@@ -45,13 +47,25 @@ public final class Composite {
         update(c);
     }
 
-    /** Updates value of this node and its ancestors taking into account an updated child c. */
+    /** Is a a proper ancestor of n (on n's parent chain)? */
+    static boolean isAncestor(Composite a, Composite n) {
+        for (Composite q = n.parent; q != null; q = q.parent) {
+            if (q == a) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Updates value of this node and its ancestors taking into account an updated child c.
+        c is a direct child whose value may have risen; when this node's value rises,
+        it is *this* node that must be reported to the parent, not c. */
     private void update(Composite c) {
         if (value < c.value) {
             value = c.value;
             maxChild = c;
             if (parent != null) {
-                parent.update(c);
+                parent.update(this);
             }
         }
     }
